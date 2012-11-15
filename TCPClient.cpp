@@ -21,7 +21,8 @@ void TCPClient::ReadMessage() {
 	this->BytesReceived += received;
 
 	if (received == 0) {
-		this->ServerDisconnectCallback(this->State);
+		if (this->ServerDisconnectCallback)
+			this->ServerDisconnectCallback(this, this->State);
 		this->Disconnect();
 		return;
 	}
@@ -31,7 +32,8 @@ void TCPClient::ReadMessage() {
 		excess = received - TCPClient::MESSAGE_LENGTHBYTES - messageLength;
 
 		while (excess >= 0 && messageLength != 0) {
-			this->ReceiveCallback(this->State, this->Buffer + TCPClient::MESSAGE_LENGTHBYTES, messageLength);
+			if (this->ReceiveCallback)
+				this->ReceiveCallback(this, this->State, this->Buffer + TCPClient::MESSAGE_LENGTHBYTES, messageLength);
 			
 			if (excess > 0) {
 				Misc::MemoryBlockCopy(this->Buffer + this->BytesReceived - excess, this->Buffer, excess);
@@ -57,6 +59,8 @@ void TCPClient::ReadMessage() {
 TCPClient::TCPClient() {
 	this->BytesReceived = 0;
 	this->State = nullptr;
+	this->ReceiveCallback = nullptr;
+	this->ServerDisconnectCallback = nullptr;
 	this->Connected = false;
 	this->Server = new Socket(Socket::Families::IPAny, Socket::Types::TCP);
 }

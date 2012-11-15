@@ -149,7 +149,9 @@ void TCPServer::Client::Disconnect() {
 	if (this->WebSocketReady && !this->WebSocketCloseSent && this->Server->IsWebSocket)
 		this->WebSocketClose(1001, false);
 		
-	this->Server->DisconnectCallback(this->State);
+	if (this->Server->DisconnectCallback)
+		this->Server->DisconnectCallback(this, this->State);
+
 	this->Server->AsyncWorker->UnregisterSocket(this->Connection);
 	this->Connection->Close();
 
@@ -194,7 +196,8 @@ void TCPServer::Client::ReadMessage() {
 		excess = received - Client::MESSAGE_LENGTHBYTES - messageLength;
 
 		while (excess >= 0 && messageLength != 0) {
-			server->ReceiveCallback(this->State, this->Buffer + Client::MESSAGE_LENGTHBYTES, messageLength);
+			if (server->ReceiveCallback)
+				server->ReceiveCallback(this, this->State, this->Buffer + Client::MESSAGE_LENGTHBYTES, messageLength);
 			
 			if (excess > 0) {
 				Misc::MemoryBlockCopy(this->Buffer + this->BytesReceived - excess, this->Buffer, excess);
@@ -372,7 +375,8 @@ void TCPServer::Client::WebSocketOnReceive() {
 						dataBuffer[i] = payloadBuffer[i] ^ maskBuffer[i % WS_MASK_BYTES];
 
 					if (FIN) {
-						this->Server->ReceiveCallback(this->State, this->Buffer, this->MessageLength + length);
+						if (this->Server->ReceiveCallback)
+							this->Server->ReceiveCallback(this, this->State, this->Buffer, this->MessageLength + length);
 						Misc::MemoryBlockCopy(this->Buffer + length + headerEnd, this->Buffer, this->BytesReceived);
 						dataBuffer = this->Buffer;
 						this->MessageLength = 0;

@@ -41,8 +41,8 @@ namespace Utilities {
 		};
 
 		typedef void* (*OnConnectCallback)(TCPServer::Client* client, uint8 clientAddress[Socket::ADDRESS_LENGTH]); /* return a pointer to a state object passed in to OnReceive */
-		typedef void (*OnDisconnectCallback)(void* state);
-		typedef void (*OnReceiveCallback)(void* state, uint8* buffer, uint16 length);
+		typedef void (*OnDisconnectCallback)(TCPServer::Client* client, void* state);
+		typedef void (*OnReceiveCallback)(TCPServer::Client* client, void* state, uint8* buffer, uint16 length);
 
 	private:
 		Socket* Listener;

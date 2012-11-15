@@ -7,8 +7,8 @@
 namespace Utilities {
 	class exported TCPClient {
 	public:
-		typedef void (*OnReceiveCallback)(void* state, uint8* buffer, uint16 length);
-		typedef void (*OnServerDisconnectCallback)(void* state);
+		typedef void (*OnReceiveCallback)(TCPClient* client, void* state, uint8* buffer, uint16 length);
+		typedef void (*OnServerDisconnectCallback)(TCPClient* client, void* state);
 
 	private:
 		static const uint32 MESSAGE_LENGTHBYTES = 2;
