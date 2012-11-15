@@ -44,7 +44,9 @@ void TCPServer::AcceptWorkerRun() {
 
 		if (acceptedSocket) {
 			newClient = new TCPServer::Client(this, acceptedSocket);
-			newClient->State = this->ConnectCallback(newClient, acceptedSocket->RemoteEndpointAddress);
+
+			if (this->ConnectCallback)
+				newClient->State = this->ConnectCallback(newClient, acceptedSocket->RemoteEndpointAddress);
 			
 			this->ClientListLock.lock();
 			this->ClientList.push_back(newClient);
