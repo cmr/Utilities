@@ -142,6 +142,45 @@ bool TCPServer::Client::Send(uint8* buffer, uint16 length) {
 	return true;
 }
 
+void TCPServer::Client::AddPart(uint8* buffer, uint16 length) {
+	assert(buffer != nullptr);
+	
+	if (this->Active)
+		this->MessageParts.push_back(make_pair(buffer, length));
+}
+
+bool TCPServer::Client::SendParts() {
+	vector<pair<uint8*, uint16>>::iterator i;
+	uint16 totalLength = 0;
+
+	if (this->Active) {
+		if (this->Server->IsWebSocket) {
+			return this->WebSocketSendParts();
+		}
+		else {
+			for (i = this->MessageParts.begin(); i != this->MessageParts.end(); i++)
+				totalLength += i->second;
+
+			if (this->Connection->EnsureWrite((uint8*)&totalLength, sizeof(totalLength), 10) != sizeof(totalLength)) {
+				this->Disconnect();
+				return false;
+			}
+			
+			for (i = this->MessageParts.begin(); i != this->MessageParts.end(); i++) {
+				if (this->Connection->EnsureWrite(i->first, i->second, 10) != i->second) {
+					this->Disconnect();
+					return false;
+				}
+			}
+		}
+	}
+	else {
+		return false;
+	}
+
+	return true;
+}
+
 void TCPServer::Client::Disconnect() {
 	vector<TCPServer::Client*>::iterator position;
 
@@ -422,6 +461,46 @@ bool TCPServer::Client::WebSocketSend(uint8* data, uint16 length, uint8 opCode) 
 		goto sendFailed;
 	if (this->Connection->EnsureWrite(data, length, 10) != length)
 		goto sendFailed;
+
+	return true;
+sendFailed:
+	this->WebSocketCloseSent = true;
+	this->Disconnect();
+	return false;
+}
+
+bool TCPServer::Client::WebSocketSendParts() {
+	uint8 bytes[4];
+	uint8 sendLength;
+	vector<pair<uint8*, uint16>>::iterator i;
+	uint16 totalLength = 0;
+	
+	for (i = this->MessageParts.begin(); i != this->MessageParts.end(); i++)
+		totalLength += i->second;
+
+	bytes[0] = 128 | WS_BINARY_OPCODE;
+	sendLength = sizeof(totalLength);
+
+	if (totalLength <= 125) {
+		bytes[1] = (uint8)totalLength;
+		*(uint16*)(bytes + 2) = 0;
+	}
+	else if (totalLength <= 65536) {
+		bytes[1] = 126;
+		sendLength += 2;
+		*(uint16*)(bytes + 2) = Socket::HostToNetworkShort(totalLength);
+	}
+	else { // we dont support longer messages
+		this->WebSocketClose(1004, true);
+		return false;	
+	}
+
+	if (this->Connection->EnsureWrite(bytes, sendLength, 10) != sendLength) 
+		goto sendFailed;
+		
+	for (i = this->MessageParts.begin(); i != this->MessageParts.end(); i++)
+		if (this->Connection->EnsureWrite(i->first, i->second, 10) != i->second)
+			goto sendFailed;
 
 	return true;
 sendFailed:

@@ -11,7 +11,7 @@
 namespace Utilities {
 	class TCPServer {
 	public:
-		class exported Client {
+		class Client {
 			static const uint32 MESSAGE_LENGTHBYTES = 2;
 			static const uint32 MESSAGE_MAXSIZE = 65536 + MESSAGE_LENGTHBYTES;
 
@@ -23,10 +23,12 @@ namespace Utilities {
 			uint8 Buffer[Client::MESSAGE_MAXSIZE];
 			uint16 BytesReceived;
 			uint32 MessageLength; //for websockets only
+			std::vector< std::pair<uint8*, uint16> > MessageParts;
 			
 			void WebSocketDoHandshake();
 			void WebSocketOnReceive();
 			bool WebSocketSend(uint8* data, uint16 length, uint8 opCode);
+			bool WebSocketSendParts();
 			void WebSocketClose(uint16 code, bool callDisconnect);
 
 		public:
@@ -35,9 +37,11 @@ namespace Utilities {
 			Client(TCPServer* server, Socket* connection);
 			~Client();
 
-			bool Send(uint8* buffer, uint16 length);
-			void Disconnect();
-			void ReadMessage();
+			exported bool Send(uint8* buffer, uint16 length);
+			exported void AddPart(uint8* buffer, uint16 length);
+			exported bool SendParts();
+			exported void Disconnect();
+			exported void ReadMessage();
 		};
 
 		typedef void* (*OnConnectCallback)(TCPServer::Client* client, uint8 clientAddress[Socket::ADDRESS_LENGTH]); /* return a pointer to a state object passed in to OnReceive */

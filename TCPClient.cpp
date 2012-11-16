@@ -111,6 +111,38 @@ bool TCPClient::Send(uint8* buffer, uint16 length) {
 	return true;
 }
 
+void TCPClient::AddPart(uint8* buffer, uint16 length) {
+	assert(buffer != nullptr);
+	
+	if (this->Connected)
+		this->MessageParts.push_back(make_pair(buffer, length));
+}
+
+bool TCPClient::SendParts() {
+	vector<pair<uint8*, uint16>>::iterator i;
+	uint16 totalLength = 0;
+
+	if (!this->Connected)
+		return false;
+
+	for (i = this->MessageParts.begin(); i != this->MessageParts.end(); i++)
+		totalLength += i->second;
+
+	if (this->Server->EnsureWrite((uint8*)&totalLength, sizeof(totalLength), 10) != sizeof(totalLength)) {
+		this->Disconnect();
+		return false;
+	}
+			
+	for (i = this->MessageParts.begin(); i != this->MessageParts.end(); i++) {
+		if (this->Server->EnsureWrite(i->first, i->second, 10) != i->second) {
+			this->Disconnect();
+			return false;
+		}
+	}
+
+	return true;
+}
+
 void TCPClient::Disconnect() {
 	if (this->Connected) {
 		
