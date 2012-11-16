@@ -140,6 +140,8 @@ bool TCPClient::SendParts() {
 		}
 	}
 
+	this->MessageParts.clear();
+
 	return true;
 }
 
@@ -158,7 +160,8 @@ void TCPClient::Disconnect() {
 		this->State = nullptr;
 		this->ReceiveCallback = nullptr;
 		this->ServerDisconnectCallback = nullptr;
-		this->Connected = false;	
+		this->Connected = false;
+		this->MessageParts.clear();	
 	}
 }
 

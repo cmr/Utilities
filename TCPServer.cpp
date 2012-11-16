@@ -178,6 +178,8 @@ bool TCPServer::Client::SendParts() {
 		return false;
 	}
 
+	this->MessageParts.clear();
+
 	return true;
 }
 
@@ -209,6 +211,7 @@ void TCPServer::Client::Disconnect() {
 	this->Server = nullptr;
 	this->State = nullptr;
 	this->Active = false;
+	this->MessageParts.clear();
 }
 
 void TCPServer::Client::ReadMessage() {
@@ -501,6 +504,8 @@ bool TCPServer::Client::WebSocketSendParts() {
 	for (i = this->MessageParts.begin(); i != this->MessageParts.end(); i++)
 		if (this->Connection->EnsureWrite(i->first, i->second, 10) != i->second)
 			goto sendFailed;
+
+	this->MessageParts.clear();
 
 	return true;
 sendFailed:
