@@ -15,10 +15,15 @@ namespace Utilities {
 			sam_t* BaseSemaphore;
 		#endif
 	public:
+		enum class DecrementResult {
+			Success,
+			TimedOut
+		};
+
 		Semaphore();
 		~Semaphore();
 		void Increment();
-		void Decrement();
+		enum DecrementResult Decrement(uint64 timeout);
 	};
 };
 

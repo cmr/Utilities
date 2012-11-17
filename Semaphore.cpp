@@ -35,10 +35,21 @@ void Semaphore::Increment() {
 #endif
 }
 
-void Semaphore::Decrement() {
+enum Semaphore::DecrementResult Semaphore::Decrement(uint64 timeout) {
 #ifdef WINDOWS
-	WaitForSingleObject(this->BaseSemaphore, INFINITE);
+	DWORD result = WaitForSingleObject(this->BaseSemaphore, timeout);
+	if (result == WAIT_TIMEOUT)
+		return Semaphore::DecrementResult::TimedOut;
+	else
+		return Semaphore::DecrementResult::Success;
 #elif defined POSIX
-	while (sem_wait(this->BaseSemaphore) == -1 && errno == EINTR);
+	timespec ts;
+	int result;
+	ts.tv_nsec = timeout * 1000;
+	while ((result = sem_timedwait(this->BaseSemaphore, &ts)) == -1 && errno == EINTR);
+	if (result == ETIMEDOUT)
+		return Semaphore::DecrementResult::TimedOut;
+	else
+		return Semaphore::DecrementResult::Success;
 #endif
 }
