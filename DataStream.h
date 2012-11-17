@@ -20,6 +20,7 @@ namespace Utilities {
 		bool IsEOF;
 		
 		DataStream();
+		DataStream(uint8* exisitingBuffer, uint64 length);
 		~DataStream();
 
 		bool Seek(uint64 position);

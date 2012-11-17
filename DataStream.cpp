@@ -6,15 +6,25 @@ DataStream::DataStream() {
 	this->Cursor = 0;
 	this->FurthestWrite = 0;
 	this->IsEOF = false;
-	this->Allocation = DataStream::MINIMUM_SIZE;
+	this->Allocation = 0;
+	this->Buffer = nullptr;
+}
+
+DataStream::DataStream(uint8* exisitingBuffer, uint64 length) {
+	this->Cursor = 0;
+	this->FurthestWrite = 0;
+	this->IsEOF = false;
+	this->Allocation = length;
 	this->Buffer = new uint8[this->Allocation];
+	memcpy(this->Buffer, exisitingBuffer, length);
 }
 
 DataStream::~DataStream() {
 	this->Cursor = 0;
 	this->FurthestWrite = 0;
 	this->IsEOF = true;
-	delete this->Buffer;
+	if (this->Buffer)
+		delete this->Buffer;
 }
 
 void DataStream::Resize(uint64 newsize) {
@@ -27,8 +37,10 @@ void DataStream::Resize(uint64 newsize) {
 
 	if (actualsize != this->Allocation) {
 		newData = new uint8[actualsize];
-		Misc::MemoryBlockCopy(this->Buffer, newData, newsize);
-		delete this->Buffer;
+		if (this->Buffer) {
+			memcpy(newData, this->Buffer, newsize);
+			delete this->Buffer;
+		}
 		this->Buffer = newData;
 	}
 	
@@ -51,7 +63,7 @@ void DataStream::Write(uint8* data, uint64 count) {
 	if (this->Cursor + count >= this->Allocation)
 		this->Resize(this->Cursor + count);
 
-	Misc::MemoryBlockCopy(data, this->Buffer + this->Cursor, count);
+	memcpy(this->Buffer + this->Cursor, data, count);
 
 	this->Cursor += count;
 
