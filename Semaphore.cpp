@@ -35,7 +35,7 @@ void Semaphore::Increment() {
 #endif
 }
 
-enum Semaphore::DecrementResult Semaphore::Decrement(uint64 timeout) {
+enum class Semaphore::DecrementResult Semaphore::Decrement(uint32 timeout) {
 #ifdef WINDOWS
 	DWORD result = WaitForSingleObject(this->BaseSemaphore, timeout);
 	if (result == WAIT_TIMEOUT)
