@@ -7,7 +7,6 @@
 
 namespace Utilities {
 	class exported DataStream {
-		uint8* Buffer;
 		uint64 Allocation;
 		uint64 Cursor;
 		uint64 FurthestWrite;
@@ -18,6 +17,7 @@ namespace Utilities {
 
 	public:
 		bool IsEOF;
+		uint8* Buffer;
 		
 		DataStream();
 		DataStream(uint8* exisitingBuffer, uint64 length);
