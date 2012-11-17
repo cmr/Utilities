@@ -23,11 +23,11 @@ namespace Utilities {
 			uint8 Buffer[Client::MESSAGE_MAXSIZE];
 			uint16 BytesReceived;
 			uint32 MessageLength; //for websockets only
-			std::vector< std::pair<uint8*, uint16> > MessageParts;
+			std::vector< std::pair<uint8 const*, uint16> > MessageParts;
 			
 			void WebSocketDoHandshake();
 			void WebSocketOnReceive();
-			bool WebSocketSend(uint8* data, uint16 length, uint8 opCode);
+			bool WebSocketSend(uint8 const* data, uint16 length, uint8 opCode);
 			bool WebSocketSendParts();
 			void WebSocketClose(uint16 code, bool callDisconnect);
 
@@ -37,8 +37,8 @@ namespace Utilities {
 			Client(TCPServer* server, Socket* connection);
 			~Client();
 
-			exported bool Send(uint8* buffer, uint16 length);
-			exported void AddPart(uint8* buffer, uint16 length);
+			exported bool Send(uint8 const* buffer, uint16 length);
+			exported void AddPart(uint8 const* buffer, uint16 length);
 			exported bool SendParts();
 			exported void Disconnect();
 			exported void ReadMessage();

@@ -10,6 +10,7 @@ namespace Utilities {
 		uint64 Allocation;
 		uint64 Cursor;
 		uint64 FurthestWrite;
+		uint8* Buffer;
 		
 		static const uint64 MINIMUM_SIZE = 32;
 
@@ -17,11 +18,13 @@ namespace Utilities {
 
 	public:
 		bool IsEOF;
-		uint8* Buffer;
 		
 		DataStream();
 		DataStream(uint8* exisitingBuffer, uint64 length);
 		~DataStream();
+
+		uint8 const* GetBuffer();
+		uint64 GetLength();
 
 		bool Seek(uint64 position);
 		void Write(uint8* bytes, uint64 count);

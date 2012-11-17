@@ -27,6 +27,14 @@ DataStream::~DataStream() {
 		delete this->Buffer;
 }
 
+uint8 const* DataStream::GetBuffer() {
+	return this->Buffer;
+}
+
+uint64 DataStream::GetLength() {
+	return this->FurthestWrite;
+}
+
 void DataStream::Resize(uint64 newsize) {
 	uint64 actualsize;
 	uint8* newData;

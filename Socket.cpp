@@ -216,7 +216,7 @@ uint32 Socket::Read(uint8* buffer, uint32 bufferSize) {
 	return (uint32)received;
 }
 
-uint32 Socket::Write(uint8* toWrite, uint32 writeAmount) {
+uint32 Socket::Write(uint8 const* toWrite, uint32 writeAmount) {
 	int32 result;
 
 	assert(toWrite != nullptr);
@@ -230,7 +230,7 @@ uint32 Socket::Write(uint8* toWrite, uint32 writeAmount) {
 	return (uint32)result;
 }
 
-uint32 Socket::EnsureWrite(uint8* toWrite, uint32 writeAmount, uint8 maxAttempts) {
+uint32 Socket::EnsureWrite(uint8 const* toWrite, uint32 writeAmount, uint8 maxAttempts) {
 	uint32 sentSoFar;
 	int32 result;
 	uint8 tries;

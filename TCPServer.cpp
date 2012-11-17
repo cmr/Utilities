@@ -116,7 +116,7 @@ TCPServer::Client::~Client() {
 	this->Disconnect();
 } 
 
-bool TCPServer::Client::Send(uint8* buffer, uint16 length) {
+bool TCPServer::Client::Send(uint8 const* buffer, uint16 length) {
 	assert(buffer != nullptr);
 	
 	if (this->Active) {
@@ -142,7 +142,7 @@ bool TCPServer::Client::Send(uint8* buffer, uint16 length) {
 	return true;
 }
 
-void TCPServer::Client::AddPart(uint8* buffer, uint16 length) {
+void TCPServer::Client::AddPart(uint8 const* buffer, uint16 length) {
 	assert(buffer != nullptr);
 	
 	if (this->Active)
@@ -150,7 +150,7 @@ void TCPServer::Client::AddPart(uint8* buffer, uint16 length) {
 }
 
 bool TCPServer::Client::SendParts() {
-	vector<pair<uint8*, uint16>>::iterator i;
+	vector<pair<uint8 const*, uint16>>::iterator i;
 	uint16 totalLength = 0;
 
 	if (this->Active) {
@@ -439,7 +439,7 @@ void TCPServer::Client::WebSocketOnReceive() {
 	}
 }
 
-bool TCPServer::Client::WebSocketSend(uint8* data, uint16 length, uint8 opCode) {
+bool TCPServer::Client::WebSocketSend(uint8 const* data, uint16 length, uint8 opCode) {
 	uint8 bytes[4];
 	uint8 sendLength;
 
@@ -475,7 +475,7 @@ sendFailed:
 bool TCPServer::Client::WebSocketSendParts() {
 	uint8 bytes[4];
 	uint8 sendLength;
-	vector<pair<uint8*, uint16>>::iterator i;
+	vector<pair<uint8 const*, uint16>>::iterator i;
 	uint16 totalLength = 0;
 	
 	for (i = this->MessageParts.begin(); i != this->MessageParts.end(); i++)

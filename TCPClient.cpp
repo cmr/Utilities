@@ -92,7 +92,7 @@ bool TCPClient::Connect(int8* address, int8* port, OnReceiveCallback receiveCall
 	return true;
 }
 
-bool TCPClient::Send(uint8* buffer, uint16 length) {
+bool TCPClient::Send(uint8 const* buffer, uint16 length) {
 	assert(buffer != nullptr);
 
 	if (!this->Connected)
@@ -111,7 +111,7 @@ bool TCPClient::Send(uint8* buffer, uint16 length) {
 	return true;
 }
 
-void TCPClient::AddPart(uint8* buffer, uint16 length) {
+void TCPClient::AddPart(uint8 const* buffer, uint16 length) {
 	assert(buffer != nullptr);
 	
 	if (this->Connected)
@@ -119,7 +119,7 @@ void TCPClient::AddPart(uint8* buffer, uint16 length) {
 }
 
 bool TCPClient::SendParts() {
-	vector<pair<uint8*, uint16>>::iterator i;
+	vector<pair<uint8 const*, uint16>>::iterator i;
 	uint16 totalLength = 0;
 
 	if (!this->Connected)

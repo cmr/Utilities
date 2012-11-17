@@ -22,15 +22,15 @@ namespace Utilities {
 		bool Connected;
 		OnReceiveCallback ReceiveCallback;
 		OnServerDisconnectCallback ServerDisconnectCallback;
-		std::vector< std::pair<uint8*, uint16> > MessageParts;
+		std::vector< std::pair<uint8 const*, uint16> > MessageParts;
 
 	public:
 		exported TCPClient::TCPClient();
 		exported TCPClient::~TCPClient();
 		 
 		exported bool Connect(int8* address, int8* port, OnReceiveCallback receiveCallback, OnServerDisconnectCallback serverDisconnectCallback, void* state);
-		exported bool Send(uint8* buffer, uint16 length);
-		exported void AddPart(uint8* buffer, uint16 length);
+		exported bool Send(uint8 const* buffer, uint16 length);
+		exported void AddPart(uint8 const* buffer, uint16 length);
 		exported bool SendParts();
 		exported void Disconnect();
 		exported void ReadMessage();

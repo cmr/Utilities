@@ -41,8 +41,8 @@ namespace Utilities {
 		Socket* Accept();
 		void Close();
 		uint32 Read(uint8* buffer, uint32 bufferSize);
-		uint32 Write(uint8* toWrite, uint32 writeAmount);
-		uint32 EnsureWrite(uint8* toWrite, uint32 writeAmount, uint8 maxAttempts);
+		uint32 Write(uint8 const* toWrite, uint32 writeAmount);
+		uint32 EnsureWrite(uint8 const* toWrite, uint32 writeAmount, uint8 maxAttempts);
 
 		static uint16 HostToNetworkShort(uint16 value);
 		static uint16 NetworkToHostShort(uint16 value);
