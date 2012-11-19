@@ -279,6 +279,7 @@ uint16 Socket::NetworkToHostShort(uint16 value) {
 SocketAsyncWorker::SocketAsyncWorker(ReadCallback callback) {
 	this->Running = true;
 	this->Callback = callback;
+	this->MaxFD = 0;
 	this->Worker = thread(&SocketAsyncWorker::Run, this);
 }
 
