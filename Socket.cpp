@@ -289,56 +289,51 @@ SocketAsyncWorker::~SocketAsyncWorker() {
 }
 
 void SocketAsyncWorker::Run() {
-	#ifdef WINDOWS
-		fd_set readSet;
-		map<Socket*, void*>::iterator listPosition;
-		struct timeval selectTimeout;
+	fd_set readSet;
+	int readySockets;
+	map<Socket*, void*>::iterator listPosition;
+	struct timeval selectTimeout;
 
-		selectTimeout.tv_usec = 250;
-		selectTimeout.tv_sec = 0;
-		listPosition = this->List.begin();
+	selectTimeout.tv_usec = 250;
+	selectTimeout.tv_sec = 0;
+	listPosition = this->List.begin();
 		
-		while (this->Running) {
-			FD_ZERO(&readSet);
+	while (this->Running) {
+		FD_ZERO(&readSet);
 
-			this_thread::sleep_for(chrono::milliseconds(25));
+		this_thread::sleep_for(chrono::milliseconds(25));
 
-			this->ListLock.lock();
+		this->ListLock.lock();
 
-			for (uint64 i = 0; i < FD_SETSIZE, listPosition != this->List.end(); i++, listPosition++) {
-				if (listPosition->second != nullptr) {
-					#ifdef WINDOWS
-						FD_SET((SOCKET)listPosition->first->RawSocket, &readSet);
-					#else defined POSIX
-
-					#endif
-				}
+		for (uint64 i = 0; i < FD_SETSIZE, listPosition != this->List.end(); i++, listPosition++) {
+			if (listPosition->second != nullptr) {
+				#ifdef WINDOWS
+					FD_SET((SOCKET)listPosition->first->RawSocket, &readSet);
+				#else defined POSIX
+					FD_SET(listPosition->first->RawSocket, &readSet);
+				#endif
 			}
-
-			if (listPosition == this->List.end())
-				listPosition = this->List.begin();
-
-			select(0, &readSet, nullptr, nullptr, &selectTimeout);
-
-			for (uint64 i = 0; i < readSet.fd_count; i++) {
-				for (map<Socket*, void*>::iterator j = this->List.begin(); j != this->List.end(); j++) {
-					Socket* socket = (*j).first;
-					void* state = (*j).second;
-
-					if (socket && state && socket->RawSocket == readSet.fd_array[i]) {
-						this->Callback(socket, state);
-						break;
-					}
-				}
-			}
-
-			this->ListLock.unlock();
 		}
 
-		return;
-	#elif defined POSIX
+		if (listPosition == this->List.end())
+			listPosition = this->List.begin();
 
-	#endif
+		readySockets = select(0, &readSet, nullptr, nullptr, &selectTimeout);
+		
+		for (map<Socket*, void*>::iterator j = this->List.begin(); j != this->List.end() && readySockets != 0; j++, readySockets--) {
+			Socket* socket = (*j).first;
+			void* state = (*j).second;
+
+			if (socket && state && FD_ISSET(socket->RawSocket, &readSet)) {
+				this->Callback(socket, state);
+				break;
+			}
+		}
+
+		this->ListLock.unlock();
+	}
+
+	return;
 }
 
 void SocketAsyncWorker::RegisterSocket(Socket* socket, void* state) {
