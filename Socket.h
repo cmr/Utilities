@@ -7,6 +7,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <atomic>
+#include <algorithm>
 
 namespace Utilities {
 
@@ -71,6 +72,7 @@ namespace Utilities {
 		std::thread Worker;
 		std::recursive_mutex ListLock;
 		std::map<Socket*, void*> List;
+		int MaxFD;
 
 		void Run();
 	};

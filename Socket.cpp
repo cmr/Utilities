@@ -318,7 +318,7 @@ void SocketAsyncWorker::Run() {
 		if (listPosition == this->List.end())
 			listPosition = this->List.begin();
 
-		readySockets = select(0, &readSet, nullptr, nullptr, &selectTimeout);
+		readySockets = select(this->MaxFD + 1, &readSet, nullptr, nullptr, &selectTimeout);
 		
 		for (map<Socket*, void*>::iterator j = this->List.begin(); j != this->List.end() && readySockets != 0; j++, readySockets--) {
 			Socket* socket = (*j).first;
@@ -338,12 +338,18 @@ void SocketAsyncWorker::Run() {
 
 void SocketAsyncWorker::RegisterSocket(Socket* socket, void* state) {
 	this->ListLock.lock();
+	this->MaxFD = max(socket->RawSocket, this->MaxFD);
 	this->List[socket] = state;
 	this->ListLock.unlock();
 }
 	
 void SocketAsyncWorker::UnregisterSocket(Socket* socket) {
 	this->ListLock.lock();
+
+	map<Socket*, void*>::iterator list = this->List.begin();
+	while(list != this->List.end())
+		this->MaxFD = max(list->first->RawSocket, this->MaxFD);
+
 	this->List[socket] = nullptr;
 	this->ListLock.unlock();
 }
