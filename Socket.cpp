@@ -1,13 +1,12 @@
 #include "Socket.h"
-
-#include <Utilities/Misc.h>
+#include "Misc.h"
 
 #ifdef WINDOWS
 	#define WIN32_LEAN_AND_MEAN
 	#define FD_SETSIZE 1024
-	#include <Windows.h>
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
+	#include <Windows.h>
 
 	static bool winsockInitialized = false;
 #elif defined POSIX
