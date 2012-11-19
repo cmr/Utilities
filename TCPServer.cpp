@@ -1,5 +1,7 @@
 #include "TCPServer.h"
 
+#include <algorithm>
+
 #include "Array.h"
 #include "Misc.h"
 #include "DataStream.h"
