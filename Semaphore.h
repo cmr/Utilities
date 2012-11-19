@@ -23,7 +23,7 @@ namespace Utilities {
 		Semaphore();
 		~Semaphore();
 		void Increment();
-		enum class DecrementResult Decrement(uint32 timeout);
+		DecrementResult Decrement(uint32 timeout);
 	};
 };
 
