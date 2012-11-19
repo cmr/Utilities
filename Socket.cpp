@@ -309,7 +309,7 @@ void SocketAsyncWorker::Run() {
 			if (listPosition->second != nullptr) {
 				#ifdef WINDOWS
 					FD_SET((SOCKET)listPosition->first->RawSocket, &readSet);
-				#else defined POSIX
+				#elif defined POSIX
 					FD_SET(listPosition->first->RawSocket, &readSet);
 				#endif
 			}
