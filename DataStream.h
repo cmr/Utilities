@@ -3,7 +3,7 @@
 
 #include "Common.h"
 #include "Misc.h"
-#include <string>
+#include <cstring>
 
 namespace Utilities {
 	class exported DataStream {
