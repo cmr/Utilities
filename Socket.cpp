@@ -173,7 +173,7 @@ Socket* Socket::Accept() {
 	int rawSocket;
 
 	rawSocket = accept(this->RawSocket, nullptr, nullptr);
-	if (sock_fd == -1) {
+	if (rawSocket == -1) {
 		return nullptr;
 	}
 	
