@@ -159,29 +159,45 @@ error:
 
 Socket* Socket::Accept() {
 	Socket* socket;
-	//struct sockaddr_in6 remoteAddress;
-	int addressLength = sizeof(struct sockaddr_in6);
+	sockaddr_storage remoteAddress;
+	sockaddr_in* ipv4Address;
+	sockaddr_in6* ipv6Address;
+	int addressLength = sizeof(remoteAddress);
 
 #ifdef WINDOWS
 	SOCKET rawSocket;
 	
-	rawSocket = accept((SOCKET)this->RawSocket, nullptr, nullptr); /* (struct sockaddr*)&remoteAddress, &addressLength); */
+	rawSocket = accept((SOCKET)this->RawSocket, (sockaddr*)&remoteAddress, &addressLength);
 	if (rawSocket == INVALID_SOCKET) {
 		return nullptr;
 	}
+
 #elif defined POSIX
 	int rawSocket;
 
-	rawSocket = accept(this->RawSocket, nullptr, nullptr);
+	rawSocket = accept(this->RawSocket, (sockaddr*)&remoteAddress, &addressLength);
 	if (rawSocket == -1) {
 		return nullptr;
 	}
-	
+
 #endif
 
 	socket = new Socket(this->Family, this->Type);
 	socket->RawSocket = rawSocket;
 	socket->Connected = true;
+
+	memset(socket->RemoteEndpointAddress, 0, sizeof(socket->RemoteEndpointAddress));
+
+	if (remoteAddress.ss_family == AF_INET) {
+		ipv4Address = (sockaddr_in*)&remoteAddress;
+		memset(socket->RemoteEndpointAddress, 0, 10); //to copy the ipv4 address in ipv6 mapped format
+		memset(socket->RemoteEndpointAddress + 10, 1, 2);
+		memcpy(socket->RemoteEndpointAddress + 12, (uint8*)&ipv4Address->sin_addr.S_un.S_addr, 4);
+	}
+	else if (remoteAddress.ss_family == AF_INET6) {
+		ipv6Address = (sockaddr_in6*)&remoteAddress;
+		memcpy(socket->RemoteEndpointAddress, ipv6Address->sin6_addr.u.Byte, sizeof(ipv6Address->sin6_addr.u.Byte));
+	}
 
 	return socket;
 }
