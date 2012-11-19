@@ -47,7 +47,7 @@ Semaphore::DecrementResult Semaphore::Decrement(uint32 timeout) {
 	int result;
 	ts.tv_nsec = timeout * 1000;
 	while ((result = sem_timedwait(this->BaseSemaphore, &ts)) == -1 && errno == EINTR);
-	if (result == ETIMEDOUT)
+	if (result == -1 && errno == ETIMEDOUT)
 		return Semaphore::DecrementResult::TimedOut;
 	else
 		return Semaphore::DecrementResult::Success;
