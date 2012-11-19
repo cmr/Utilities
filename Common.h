@@ -4,6 +4,7 @@
 #ifdef _WIN64
 	#define WINDOWS
 	#define exported  __declspec(dllexport)
+	#define _CRT_SECURE_NO_WARNINGS
 #elif __unix__
 	#define POSIX
 	#define exported __attribute__((visibility ("default")))
