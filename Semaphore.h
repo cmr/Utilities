@@ -12,7 +12,7 @@ namespace Utilities {
 		#ifdef WINDOWS
 			void* BaseSemaphore;
 		#elif defined POSIX
-			sam_t* BaseSemaphore;
+			sem_t* BaseSemaphore;
 		#endif
 	public:
 		enum class DecrementResult {
