@@ -48,7 +48,7 @@ namespace Utilities {
 		static uint16 NetworkToHostShort(uint16 value);
 
 	private:
-		bool Socket::PrepareRawSocket(int8* address, int8* port, bool willListenOn, void** addressInfo);
+		bool PrepareRawSocket(int8* address, int8* port, bool willListenOn, void** addressInfo);
 
 		Types Type;
 		Families Family;
