@@ -39,6 +39,8 @@ void Utilities::Cryptography::SHA512(uint8* source, uint32 length, uint8 hashOut
 	EVP_DigestInit_ex(ctx, EVP_sha512(), nullptr);
 	EVP_DigestUpdate(ctx, (void*)source, length);
 	EVP_DigestFinal_ex(ctx, (unsigned char*)hashOutput, nullptr);
+	
+	EVP_MD_CTX_destroy(ctx);
 #endif
 }
 
