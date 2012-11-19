@@ -277,9 +277,11 @@ uint16 Socket::NetworkToHostShort(uint16 value) {
 
 
 SocketAsyncWorker::SocketAsyncWorker(ReadCallback callback) {
+	#ifdef POSIX
+	this->MaxFD = 0;
+	#endif
 	this->Running = true;
 	this->Callback = callback;
-	this->MaxFD = 0;
 	this->Worker = thread(&SocketAsyncWorker::Run, this);
 }
 
@@ -318,8 +320,12 @@ void SocketAsyncWorker::Run() {
 
 		if (listPosition == this->List.end())
 			listPosition = this->List.begin();
-
-		readySockets = select(this->MaxFD + 1, &readSet, nullptr, nullptr, &selectTimeout);
+			
+		#ifdef WINDOWS
+			readySockets = select(0, &readSet, nullptr, nullptr, &selectTimeout);
+		#elif defined POSIX
+			readySockets = select(this->MaxFD + 1, &readSet, nullptr, nullptr, &selectTimeout);
+		#endif
 		
 		for (map<Socket*, void*>::iterator j = this->List.begin(); j != this->List.end() && readySockets != 0; j++, readySockets--) {
 			Socket* socket = (*j).first;
@@ -339,17 +345,20 @@ void SocketAsyncWorker::Run() {
 
 void SocketAsyncWorker::RegisterSocket(Socket* socket, void* state) {
 	this->ListLock.lock();
+	#ifdef POSIX
 	this->MaxFD = max(socket->RawSocket, this->MaxFD);
+	#endif
 	this->List[socket] = state;
 	this->ListLock.unlock();
 }
 	
 void SocketAsyncWorker::UnregisterSocket(Socket* socket) {
 	this->ListLock.lock();
-
-	map<Socket*, void*>::iterator list = this->List.begin();
-	while(list != this->List.end())
-		this->MaxFD = max(list->first->RawSocket, this->MaxFD);
+	
+	#ifdef POSIX
+	for(map<Socket*, void*>::iterator i = this->List.begin(); i != this->List.end(); i++)
+		this->MaxFD = max(i->first->RawSocket, this->MaxFD);
+	#endif
 
 	this->List[socket] = nullptr;
 	this->ListLock.unlock();

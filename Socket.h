@@ -72,7 +72,10 @@ namespace Utilities {
 		std::thread Worker;
 		std::recursive_mutex ListLock;
 		std::map<Socket*, void*> List;
+
+		#ifdef POSIX
 		int MaxFD;
+		#endif
 
 		void Run();
 	};
