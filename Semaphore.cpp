@@ -11,7 +11,7 @@ using namespace Utilities;
 
 Semaphore::Semaphore() {
 #ifdef WINDOWS
-	this->BaseSemaphore = CreateSemaphore(NULL, 0, 4294967295, NULL);
+	this->BaseSemaphore = CreateSemaphore(NULL, 0, 10000, NULL);
 #elif defined POSIX
 	this->BaseSemaphore = new sem_t;
 	sem_init(this->BaseSemaphore, 0 /* shared between threads */, 0);
