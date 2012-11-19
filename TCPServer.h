@@ -63,8 +63,8 @@ namespace Utilities {
 		void AcceptWorkerRun();
 
 	public:
-		exported TCPServer::TCPServer();
-		exported TCPServer::~TCPServer();
+		exported TCPServer();
+		exported ~TCPServer();
 				 
 		exported bool Listen(int8* port, bool isWebSocket, OnConnectCallback connectCallback, OnReceiveCallback receiveCallback, OnDisconnectCallback disconnectCallback);
 		exported void Shutdown();
