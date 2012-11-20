@@ -175,7 +175,7 @@ Socket* Socket::Accept() {
 #elif defined POSIX
 	int rawSocket;
 
-	rawSocket = accept(this->RawSocket, (sockaddr*)&remoteAddress, &addressLength);
+	rawSocket = accept(this->RawSocket, (sockaddr*)&remoteAddress, (socklen_t*)&addressLength);
 	if (rawSocket == -1) {
 		return nullptr;
 	}
