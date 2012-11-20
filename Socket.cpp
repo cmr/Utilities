@@ -192,11 +192,19 @@ Socket* Socket::Accept() {
 		ipv4Address = (sockaddr_in*)&remoteAddress;
 		memset(socket->RemoteEndpointAddress, 0, 10); //to copy the ipv4 address in ipv6 mapped format
 		memset(socket->RemoteEndpointAddress + 10, 1, 2);
+#ifdef WINDOWS
 		memcpy(socket->RemoteEndpointAddress + 12, (uint8*)&ipv4Address->sin_addr.S_un.S_addr, 4);
+#elif defined POSIX
+		memcpy(socket->RemoteEndpointAddress + 12, (uint8*)&ipv4Address->sin_addr.s_addr, 4);
+#endif
 	}
 	else if (remoteAddress.ss_family == AF_INET6) {
 		ipv6Address = (sockaddr_in6*)&remoteAddress;
+#ifdef WINDOWS
 		memcpy(socket->RemoteEndpointAddress, ipv6Address->sin6_addr.u.Byte, sizeof(ipv6Address->sin6_addr.u.Byte));
+#elif defined POSIX
+		memcpy(socket->RemoteEndpointAddress, ipv6Address->sin6_addr.s6_addr, sizeof(ipv6Address->sin6_addr.s6_addr));
+#endif
 	}
 
 	return socket;
