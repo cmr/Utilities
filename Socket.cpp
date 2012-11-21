@@ -380,8 +380,7 @@ void SocketAsyncWorker::UnregisterSocket(Socket* socket) {
 	this->ListLock.lock();
 	
 	#ifdef POSIX
-	for(map<Socket*, void*>::iterator i = this->List.begin(); i != this->List.end(); i++)
-		this->MaxFD = max(i->first->RawSocket, this->MaxFD);
+	this->MaxFD = max_element(this->List.begin(), this->List.end())->first->RawSocket;
 	#endif
 
 	this->List[socket] = nullptr;
