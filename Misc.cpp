@@ -1,7 +1,9 @@
 #include "Misc.h"
+#include <cstring>
+#include <algorithm>
 
-void Utilities::Misc::Base64Encode(uint8* data, uint32 dataLength, int8** result, uint32* resultLength) {
-	static char* characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+void Utilities::Misc::Base64Encode(const uint8* data, uint32 dataLength, int8** result, uint32* resultLength) {
+	static const char* characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	static int32 mask = 0x3F;
 	uint32 i, j, left;
 
@@ -83,25 +85,12 @@ bool Utilities::Misc::IsStringUTF8(std::string str) {
 	return true;
 }
 
-void Utilities::Misc::MemoryBlockCopy(uint8* source, uint8* destination, uint64 amount) {
-	uint8 i;
-
-	if (amount > 0) {
-		for (; amount >= 8; amount -= 8) 
-			*(uint64*)(destination + amount - 8) = *(uint64*)(source + amount - 8);
-
-		for (i = 0; i < amount; i++)
-			*(uint8*)(destination + i) = *(source + i);
-	}
+void Utilities::Misc::MemoryBlockCopy(const uint8* source, uint8* destination, uint64 amount) {
+	memcpy(destination, source, amount);
 }
 
-bool Utilities::Misc::MemoryCompare(uint8* blockA, uint8* blockB, uint64 lengthA, uint64 lengthB) {
+bool Utilities::Misc::MemoryCompare(const uint8* blockA, const uint8* blockB, uint64 lengthA, uint64 lengthB) {
 	if (lengthA != lengthB)
 		return false;
-
-	for (; lengthA > 0; lengthA--)
-		if (blockA[lengthA - 1] != blockB[lengthA - 1])
-			return false;
-
-	return true;
+	return memcmp(blockA, blockB, std::min(lengthA, lengthB)) == 0 ? true : false;
 }
